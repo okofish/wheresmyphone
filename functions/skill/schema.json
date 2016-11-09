@@ -1,0 +1,45 @@
+{
+   "intents": [
+      {
+         "intent": "CallIntent",
+         "slots": []
+      },
+      {
+         "intent": "AMAZON.NoIntent",
+         "slots": []
+      },
+      {
+         "intent": "AMAZON.CancelIntent",
+         "slots": []
+      },
+      {
+         "intent": "AMAZON.StopIntent",
+         "slots": []
+      },
+      {
+         "intent": "AMAZON.YesIntent",
+         "slots": []
+      },
+      {
+         "intent": "SetPhoneNumberIntent",
+         "slots": []
+      },
+      {
+         "intent": "PhoneNumberIntent",
+         "slots": [
+            {
+               "name": "PhoneNumber",
+               "type": "NUMBER"
+            }
+         ]
+      },
+      {
+         "intent": "ResendVerificationCallIntent",
+         "slots": []
+      },
+      {
+         "intent": "AMAZON.HelpIntent",
+         "slots": []
+      }
+   ]
+}

@@ -1,0 +1,54 @@
+CallIntent	call my phone again
+CallIntent	find my phone again
+CallIntent	where's my phone again
+CallIntent	call the phone again
+CallIntent	find the phone again
+CallIntent	where's the phone again
+CallIntent	call my phone
+CallIntent	find my phone
+CallIntent	where's my phone
+CallIntent	call the phone
+CallIntent	find the phone
+CallIntent	where's the phone
+CallIntent	call it again
+CallIntent	find it again
+CallIntent	call it
+CallIntent	find it
+AMAZON.NoIntent	do neither
+AMAZON.NoIntent	neither
+AMAZON.NoIntent	don't do anything
+AMAZON.YesIntent	yes it is
+AMAZON.YesIntent	yes they are
+SetPhoneNumberIntent	set my phone number
+SetPhoneNumberIntent	change my phone number
+SetPhoneNumberIntent	set the phone number
+SetPhoneNumberIntent	change the phone number
+SetPhoneNumberIntent	set my number
+SetPhoneNumberIntent	change my number
+SetPhoneNumberIntent	set the number
+SetPhoneNumberIntent	change the number
+SetPhoneNumberIntent	set it
+SetPhoneNumberIntent	change it
+PhoneNumberIntent	{PhoneNumber}
+ResendVerificationCallIntent	resend the verification call
+ResendVerificationCallIntent	re-send the verification call
+ResendVerificationCallIntent	resend the call
+ResendVerificationCallIntent	re-send the call
+ResendVerificationCallIntent	resend it
+ResendVerificationCallIntent	re-send it
+ResendVerificationCallIntent	reverify it
+ResendVerificationCallIntent	re-verify it
+ResendVerificationCallIntent	verify it
+ResendVerificationCallIntent	resend
+ResendVerificationCallIntent	re-send
+ResendVerificationCallIntent	reverify
+ResendVerificationCallIntent	re-verify
+ResendVerificationCallIntent	verify
+AMAZON.HelpIntent	help me find my phone
+AMAZON.HelpIntent	help find my phone
+AMAZON.HelpIntent	help me call my phone
+AMAZON.HelpIntent	help call my phone
+AMAZON.HelpIntent	help me find phone
+AMAZON.HelpIntent	help find phone
+AMAZON.HelpIntent	help me call phone
+AMAZON.HelpIntent	help call phone

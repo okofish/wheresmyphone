@@ -1,0 +1,14 @@
+{
+  "name": "alexa-wheresmyphone-caller",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jesse Friedman <jesse@jesse.ws> (https://jesse.ws/)",
+  "license": "ISC",
+  "dependencies": {
+    "twilio": "^2.11.0"
+  }
+}

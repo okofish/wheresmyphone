@@ -1,0 +1,15 @@
+{
+  "name": "alexa-wheresmyphone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jesse Friedman <jesse@jesse.ws> (https://jesse.ws/)",
+  "license": "ISC",
+  "dependencies": {
+    "alexa-app": "^2.3.4",
+    "aws-sdk": "^2.6.12"
+  }
+}
