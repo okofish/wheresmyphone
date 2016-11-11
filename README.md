@@ -1,5 +1,7 @@
 # Where'sMyPhone
 
+## Get Where'sMyPhone on your Alexa-enabled device [here](https://www.amazon.com/Jesse-Friedman-WheresMyPhone/dp/B01M6AFH5L/)!
+
 **Ever lose your phone in your own house/apartment? Under a cushion, in the bathroom, in the microwave...**
 
 Ok, maybe that last one's just me. In any case, the time-honored human tradition of asking your friend to call your phone so you can find it seems out-of-place in this advanced world we live in. In 2016, who needs a human friend - we have Alexa!
