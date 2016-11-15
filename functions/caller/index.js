@@ -16,7 +16,7 @@ exports.handle = function(event, context, cb) {
     var body = event['body-json'];
     
     //TODO: make this origin checking a bit more robust
-    if (body.AccountSid === config.ACCOUNT_SID) {
+    if (body.AccountSid === config.ACCOUNT_SID && userId) {
       if (type === 'call') {
         sayLine(resp, 'locator-intro');
       
