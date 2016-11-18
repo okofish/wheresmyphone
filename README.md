@@ -17,3 +17,8 @@ Where'sMyPhone relies on a DynamoDB database called WheresMyPhoneUsers to store 
 The `apigateway-spec.json` file consists of the API Gateway used for the *caller* function to serve TwiML, exported from the API Gateway console. You can import this file into your own console to replicate the same functionality.
 
 You will need a Twilio account and phone number to use this code. Enter your Twilio information and your API Gateway URL in the `config-example.json` file in the *caller* function, and rename this file to `config.json`.
+
+## TODO
+
+- [ ] Add support for multiple phone numbers per user
+- [ ] Re-record voice lines (I think they could use a little work.)
