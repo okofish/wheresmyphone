@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "alexa-app": "^2.3.4",
+    "analytics-node": "^2.1.0",
     "aws-sdk": "^2.6.12"
   }
 }

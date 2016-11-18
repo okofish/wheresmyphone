@@ -1,10 +1,37 @@
 var alexa = require('alexa-app');
 var AWS = require('aws-sdk');
+var Analytics = require('analytics-node');
 
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 var lambda = new AWS.Lambda();
+if (process.env['SEGMENT_KEY']) {
+  var analytics = new Analytics(process.env['SEGMENT_KEY'], {
+    flushAt: 1
+  });
+} else {
+  // this makes a dummy analytics object
+  var analytics = {
+    identify: new Function(),
+    track: new Function()
+  }
+}
 
 var app = new alexa.app('Where\'sMyPhone');
+
+app.pre = function(request, response, type) {
+  analytics.identify({
+    userId: request.sessionDetails.userId
+  });
+  analytics.track({
+    userId: request.sessionDetails.userId,
+    event: 'Intent Request',
+    properties: {
+      sessionId: request.sessionDetails.sessionId,
+      type: type,
+      intent: type === 'IntentRequest' ? request.data.request.intent.name : undefined
+    }
+  });
+}
 
 app.intent('CallIntent', {
   slots: {},
@@ -13,11 +40,31 @@ app.intent('CallIntent', {
   checkForNumber(request.sessionDetails.userId, function(userRecord) {
     if (userRecord) {
       if (userRecord.verified === true) {
-        callNumber('call', userRecord, function() {
+        analytics.track({
+          userId: request.sessionDetails.userId,
+          event: 'Call Request',
+          properties: {
+            sessionId: request.sessionDetails.sessionId,
+            type: 'successful'
+          }
+        });
+        callNumber('call', {
+          number: userRecord.number,
+          userId: userRecord.userId,
+          sessionId: request.sessionDetails.sessionId
+        }, function() {
           response.say('Calling your phone now.');
           response.send();
         });
       } else {
+        analytics.track({
+          userId: request.sessionDetails.userId,
+          event: 'Call Request',
+          properties: {
+            sessionId: request.sessionDetails.sessionId,
+            type: 'unverified'
+          }
+        });
         response.say('It looks like your number <say-as interpret-as="telephone">' + userRecord.number + '</say-as> hasn\'t been verified yet.');
         response.say('Would you like to re-send the verification call, or change the number?');
         response.reprompt('Would you like to re-send the verification call, or change the number?');
@@ -28,6 +75,14 @@ app.intent('CallIntent', {
         response.send();
       }
     } else {
+      analytics.track({
+        userId: request.sessionDetails.userId,
+        event: 'Call Request',
+        properties: {
+          sessionId: request.sessionDetails.sessionId,
+          type: 'unset'
+        }
+      });
       response.say('It looks like you don\'t have a phone number set.');
       response.say('Would you like to set your phone number?');
       response.reprompt('Would you like to set your phone number?');
@@ -40,10 +95,63 @@ app.intent('CallIntent', {
   return false;
 });
 
+app.intent('AMAZON.YesIntent', {
+  utterances: ['yes it is', 'yes they are']
+}, function(request, response) {
+  if (request.session('state') === 'SetPhoneNumberQuery') {
+    response.say('Please dictate the ten digits of your phone number.');
+    response.reprompt('Please dictate the ten digits of your phone number.');
+    response.shouldEndSession(false);
+    response.session('state', 'PhoneNumberQuery');
+    response.session('number', null);
+  } else if (request.session('state') === 'VerifyHeardNumberQuery') {
+    var number = parseInt(request.session('number'));
+
+    analytics.track({
+      userId: request.sessionDetails.userId,
+      event: 'Number Entry',
+      properties: {
+        sessionId: request.sessionDetails.sessionId,
+        type: 'correct',
+        numberLength: request.session('number').toString().length,
+        numberFirstDigit: request.session('number').toString()[0]
+      }
+    });
+    response.session('state', null);
+    response.session('number', null);
+    addNumber(request.sessionDetails.userId, number, function() {
+      callNumber('verify', {
+        number: number,
+        userId: request.sessionDetails.userId,
+        sessionId: request.sessionDetails.sessionId
+      }, function() {
+        response.say('OK, I\'ve sent a verification call to that number.');
+        response.send();
+      });
+    });
+
+    return false
+  } else {
+    response.say('I\'m not sure what you meant.');
+    response.session('state', null);
+  }
+});
+
 app.intent('AMAZON.NoIntent', {
   utterances: ['{do |}neither', 'don\'t do anything']
 }, function(request, response) {
   if (request.session('state') === 'VerifyHeardNumberQuery') {
+    analytics.track({
+      userId: request.sessionDetails.userId,
+      event: 'Number Entry',
+      properties: {
+        sessionId: request.sessionDetails.sessionId,
+        type: 'misheard',
+        numberLength: request.session('number').toString().length,
+        numberFirstDigit: request.session('number').toString()[0]
+      }
+    });
+
     response.say('Please dictate the ten digits of your phone number.');
     response.reprompt('Please dictate the ten digits of your phone number.');
     response.shouldEndSession(false);
@@ -65,34 +173,6 @@ app.intent('AMAZON.StopIntent', function(request, response) {
   response.say('OK.');
   response.session('number', null);
   response.session('state', null);
-});
-
-app.intent('AMAZON.YesIntent', {
-  utterances: ['yes it is', 'yes they are']
-}, function(request, response) {
-  if (request.session('state') === 'SetPhoneNumberQuery') {
-    response.say('Please dictate the ten digits of your phone number.');
-    response.reprompt('Please dictate the ten digits of your phone number.');
-    response.shouldEndSession(false);
-    response.session('state', 'PhoneNumberQuery');
-    response.session('number', null);
-  } else if (request.session('state') === 'VerifyHeardNumberQuery') {
-    var number = parseInt(request.session('number'));
-
-    response.session('state', null);
-    response.session('number', null);
-    addNumber(request.sessionDetails.userId, number, function() {
-      callNumber('verify', {number: number, userId: request.sessionDetails.userId}, function() {
-        response.say('OK, I\'ve sent a verification call to that number.');
-        response.send();
-      });
-    });
-
-    return false
-  } else {
-    response.say('I\'m not sure what you meant.');
-    response.session('state', null);
-  }
 });
 
 app.intent('SetPhoneNumberIntent', {
@@ -123,6 +203,16 @@ app.intent('PhoneNumberIntent', {
       response.session('state', 'VerifyHeardNumberQuery');
       response.session('number', number);
     } else {
+      analytics.track({
+        userId: request.sessionDetails.userId,
+        event: 'Number Entry',
+        properties: {
+          sessionId: request.sessionDetails.sessionId,
+          type: 'invalid',
+          numberLength: request.slot('PhoneNumber').trim().length,
+          numberFirstDigit: request.slot('PhoneNumber').trim()[0]
+        }
+      });
       response.say(app.name + ' only supports 10-digit North American Numbering Plan phone numbers. Please dictate the ten digits of your phone number.');
       response.reprompt('Please dictate the ten digits of your phone number.');
       response.shouldEndSession(false);
@@ -143,7 +233,11 @@ app.intent('ResendVerificationCallIntent', {
   if (request.session('state') === 'ResendVerificationCallQuery' && request.session('number')) {
     var number = parseInt(request.session('number'));
 
-    callNumber('verify', {number: number, userId: request.sessionDetails.userId}, function() {
+    callNumber('verify', {
+      number: number,
+      userId: request.sessionDetails.userId,
+      sessionId: request.sessionDetails.sessionId
+    }, function() {
       response.say('OK, re-sending the verification call now.');
       response.send();
     });
@@ -168,6 +262,14 @@ app.launch(function(request, response) {
 
   checkForNumber(request.sessionDetails.userId, function(userRecord) {
     if (userRecord) {
+      analytics.track({
+        userId: request.sessionDetails.userId,
+        event: 'Skill Launch',
+        properties: {
+          sessionId: request.sessionDetails.sessionId,
+          type: 'successful'
+        }
+      });
       response.say('Would you like me to call your phone, or change your phone number?');
       response.reprompt('Would you like me to call your phone, or change your phone number?');
     } else {
@@ -216,6 +318,14 @@ function addNumber(userId, number, cb) {
 }
 
 function callNumber(type, opts, cb) {
+  analytics.track({
+    userId: opts.userId,
+    event: 'Call',
+    properties: {
+      sessionId: opts.sessionId,
+      type: type
+    }
+  });
   lambda.invoke({
     FunctionName: 'alexa-wheresmyphone_caller',
     InvocationType: 'Event',
