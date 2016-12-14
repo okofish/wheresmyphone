@@ -2,7 +2,7 @@
   "name": "alexa-wheresmyphone",
   "description": "Alexa skill handler and Twilio caller function for Where's My Phone",
   "memory": 128,
-  "timeout": 5,
+  "timeout": 10,
   "role": "arn:aws:iam::694283863869:role/alexa-wheresmyphone_lambda_function",
   "environment": {}
 }
