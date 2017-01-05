@@ -3,5 +3,6 @@
   "AUTH_TOKEN": "<your twilio auth token here>",
   "NUMBER": "+15558675309",
   "TWIML_URL": "https://qy4w6mxcfd.execute-api.us-east-1.amazonaws.com/prod/twiml.xml",
-  "AUDIO_BASE": "http://wheresmyphone.jesse.ws/audio/"
+  "AUDIO_BASE": "http://wheresmyphone.jesse.ws/audio/",
+  "USE_AUDIO": true
 }

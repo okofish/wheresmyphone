@@ -5,8 +5,6 @@ var AWS = require('aws-sdk');
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 var twilio = Twilio(config.ACCOUNT_SID, config.AUTH_TOKEN);
 
-var useAudio = true;
-
 exports.handle = function(event, context, cb) {
   if (event.hasOwnProperty('body-json')) {
     // we're being called for twiml from twilio
@@ -146,7 +144,7 @@ function sayLine(resp, line) {
     'goodbye': 'Goodbye.'
   }
   
-  if (useAudio === true) {
+  if (config.USE_AUDIO === true) {
     resp.play(config.AUDIO_BASE + line + '.wav');
   } else {
     resp.say(lines[line]);
